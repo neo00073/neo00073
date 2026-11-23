@@ -97,8 +97,30 @@ td .grp{font-size:.68rem;color:var(--muted);display:block}
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.85rem}
 .confirm button{font:inherit;font-size:.8rem;padding:5px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .confirm .danger{background:var(--warn);color:var(--surface);border-color:var(--warn)}
+.wrap{padding-bottom:140px}
+.restbtn{margin-top:7px;display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:.8rem;color:var(--accent);background:var(--accent-soft);border:1px solid transparent;border-radius:5px;padding:5px 10px;cursor:pointer}
+.restbtn svg{width:14px;height:14px;flex:none}
+.restbtn:hover{border-color:var(--accent)}
+.timer{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.10);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));transition:background .3s}
+.timer-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap}
+.t-time{font-family:var(--f-mono);font-size:2.1rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1;min-width:4.6ch}
+.t-info{flex:1;min-width:140px}
+.t-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-track{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:6px}
+.t-track i{display:block;height:100%;width:0;background:var(--accent)}
+.t-btns{display:flex;gap:6px;flex-wrap:wrap}
+.t-btns button{font:inherit;font-size:.82rem;padding:7px 11px;border-radius:5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+.t-btns button.pri{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.timer.idle .t-time{color:var(--muted)}
+.timer.end{background:var(--done-soft)}
+.timer.end .t-time{color:var(--done)}
+.timer.end .t-track i{background:var(--done)}
+.timer.pause .t-time{color:var(--warn)}
 @media (max-width:640px){
   h1{font-size:2.1rem}
+  .t-time{font-size:1.8rem}
+  .t-btns{width:100%}
+  .t-btns button{flex:1}
   .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
   .notes-grid,.tips{grid-template-columns:1fr}
   .plan{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -169,6 +191,19 @@ td .grp{font-size:.68rem;color:var(--muted);display:block}
   </section>
 </div>
 
+<div class="timer idle" id="timer" role="region" aria-label="Timer di recupero">
+  <div class="timer-in">
+    <span class="t-time" id="tTime" aria-live="off">0:00</span>
+    <div class="t-info">
+      <div class="t-name" id="tName">Timer recupero</div>
+      <div class="lbl" id="tState">Tocca "Recupero" su un esercizio o scegli un tempo</div>
+      <div class="t-track"><i id="tBar"></i></div>
+    </div>
+    <div class="t-btns" id="tBtns"></div>
+    <span class="sr" id="tLive" aria-live="assertive" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></span>
+  </div>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -193,7 +228,7 @@ const DAYS = [
   coreEx:[
    {id:"abwheel",n:"Ab wheel rollout",p:["3×8–10 · rec 60″","3×10–12 · rec 60″"],t:"Bacino in retroversione, non lasciare cadere i fianchi."},
    {id:"bodysaw",n:"Body saw su TRX / slider",p:["3×30″ · rec 45″","3×45″ · rec 45″"]},
-   {id:"deadbugkg",n:"Dead bug con manubrio",p:["3×8 per lato","3×10 per lato"],w:1}],
+   {id:"deadbugkg",n:"Dead bug con manubrio",p:["3×8 per lato · rec 45″","3×10 per lato · rec 45″"],w:1}],
   cool:[{id:"a-c1",n:"Allungamento pettorali al muro + child pose + respirazione 90/90",p:["5′","5′"]}]},
  {id:"B", name:"Mercoledì", title:"Gambe", muscles:"Quadricipiti · Femorali · Glutei · Polpacci", core:"Core: flessione e trasporti",
   warm:[
@@ -212,7 +247,7 @@ const DAYS = [
   coreEx:[
    {id:"legraise",n:"Hanging leg raise",p:["3×10–12 · rec 60″","3×12–15 · rec 60″"],t:"Arrotonda il bacino verso l'alto, senza slancio."},
    {id:"cablecrunch",n:"Cable crunch in ginocchio",p:["3×12–15 · rec 60″","3×10–12 · rec 60″"],w:1},
-   {id:"suitcase",n:"Suitcase carry (kettlebell)",p:["3×30 m per lato","3×40 m per lato"],t:"Spalle in linea, non inclinarti verso il peso.",w:1}],
+   {id:"suitcase",n:"Suitcase carry (kettlebell)",p:["3×30 m per lato · rec 60″","3×40 m per lato · rec 60″"],t:"Spalle in linea, non inclinarti verso il peso.",w:1}],
   cool:[{id:"b-c1",n:"Allungamento flessori dell'anca, quadricipiti, femorali",p:["5′","5′"]}]},
  {id:"C", name:"Venerdì", title:"Trazione", muscles:"Dorsali · Trapezi · Deltoide posteriore · Bicipiti", core:"Core: anti-rotazione",
   warm:[
@@ -232,7 +267,7 @@ const DAYS = [
   coreEx:[
    {id:"pallof",n:"Pallof press ai cavi",p:["3×10 per lato · rec 45″","3×12 per lato · tieni 2″"],w:1},
    {id:"chopper",n:"Woodchopper cavo alto → basso",p:["3×10 per lato · rec 45″","3×12 per lato · rec 45″"],w:1},
-   {id:"sideplank",n:"Side plank",p:["3×30″ per lato","3×45″ per lato · gamba sollevata"]}],
+   {id:"sideplank",n:"Side plank",p:["3×30″ per lato · rec 30″","3×45″ per lato · gamba sollevata · rec 30″"]}],
   cool:[{id:"c-c1",n:"Allungamento dorsali alla sbarra, bicipiti, rotazioni toraciche",p:["5′","5′"]}]}
 ];
 const BLOCKS = [
@@ -380,6 +415,13 @@ function renderSession(){
       btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       const info=el("div",{style:"min-width:0"},el("div",{class:"nm",text:e.n}),el("div",{class:"pres",text:presFor(e,w)}));
       if(e.t) info.append(el("div",{class:"tip",text:e.t}));
+      const rs=parseRest(presFor(e,w));
+      if(rs){
+        const rb=el("button",{class:"restbtn",type:"button","aria-label":`Avvia recupero di ${fmtT(rs)} per ${e.n}`,onclick:()=>startTimer(e.n,rs)});
+        rb.innerHTML='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l2.5 2M9.5 2.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+        rb.append(document.createTextNode("Recupero "+fmtT(rs)));
+        info.append(rb);
+      }
       const right=el("div",{class:"kg"});
       if(e.w){
         const id=`kg-${w}-${e.id}`;
@@ -458,6 +500,68 @@ function renderAll(fromRemote){
   if(fromRemote&&aid) return; // non interrompere chi sta scrivendo
   renderWeeks();renderDays();renderSession();renderProgress();renderBody();renderNotes();renderReset();
 }
+// ---------- Timer di recupero ----------
+function parseRest(p){const m=String(p).match(/rec\s+(?:(\d+)′)?(?:(\d+)″)?/);if(!m||(!m[1]&&!m[2]))return null;return (+(m[1]||0))*60+(+(m[2]||0));}
+function fmtT(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+const T={status:"idle",name:"",total:0,endAt:0,left:0,lastBeep:null};
+let actx=null, wakeLock=null, tickId=null;
+function ensureAudio(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();}catch(e){actx=null;}}
+function beep(freq,dur,vol){
+  if(!actx)return;
+  try{const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime;
+    o.type="sine";o.frequency.value=freq;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||0.35,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(actx.destination);o.start(t);o.stop(t+dur+0.05);}catch(e){}
+}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p);}catch(e){}}
+async function lockScreen(){try{if(navigator.wakeLock&&!wakeLock){wakeLock=await navigator.wakeLock.request("screen");wakeLock.addEventListener("release",()=>{wakeLock=null;});}}catch(e){wakeLock=null;}}
+function unlockScreen(){try{wakeLock&&wakeLock.release();}catch(e){}wakeLock=null;}
+function startTimer(name,secs){
+  ensureAudio();
+  Object.assign(T,{status:"run",name,total:secs,endAt:Date.now()+secs*1000,left:secs,lastBeep:null});
+  lockScreen();loop();drawTimer();
+  $("tLive").textContent=`Recupero di ${fmtT(secs)} avviato`;
+}
+function loop(){clearInterval(tickId);tickId=setInterval(tick,200);}
+function tick(){
+  if(T.status!=="run")return;
+  T.left=(T.endAt-Date.now())/1000;
+  const s=Math.ceil(T.left);
+  if(s<=3&&s>=1&&T.lastBeep!==s){T.lastBeep=s;beep(660,0.12,0.25);}
+  if(T.left<=0){
+    T.status="end";T.left=0;clearInterval(tickId);
+    beep(880,0.25);setTimeout(()=>beep(880,0.25),320);setTimeout(()=>beep(1175,0.5),640);
+    buzz([300,150,300,150,500]);unlockScreen();
+    $("tLive").textContent="Recupero finito, prossima serie";
+  }
+  drawTimer();
+}
+function pauseTimer(){if(T.status==="run"){T.left=(T.endAt-Date.now())/1000;T.status="pause";clearInterval(tickId);}else if(T.status==="pause"){T.endAt=Date.now()+T.left*1000;T.status="run";loop();}drawTimer();}
+function addTime(d){if(T.status==="run"){T.endAt+=d*1000;}else if(T.status==="pause"){T.left=Math.max(0,T.left+d);}if(d>0)T.total+=d;tick();drawTimer();}
+function stopTimer(){T.status="idle";T.name="";clearInterval(tickId);unlockScreen();drawTimer();}
+function drawTimer(){
+  const box=$("timer");box.className="timer "+T.status;
+  const left=T.status==="run"?(T.endAt-Date.now())/1000:T.left;
+  $("tTime").textContent=T.status==="idle"?"0:00":fmtT(left);
+  $("tName").textContent=T.status==="idle"?"Timer recupero":T.name;
+  $("tState").textContent={idle:'Tocca "Recupero" su un esercizio o scegli un tempo',run:`Recupero di ${fmtT(T.total)}`,pause:"In pausa",end:"Recupero finito · prossima serie"}[T.status];
+  $("tBar").style.width=(T.status==="idle"||!T.total?0:Math.min(100,(1-Math.max(0,left)/T.total)*100))+"%";
+  const b=$("tBtns");
+  const want=T.status==="run"||T.status==="pause"?"active":"pick";
+  if(b.dataset.mode===want&&want==="active"){b.querySelector("[data-p]").textContent=T.status==="pause"?"Riprendi":"Pausa";return;}
+  if(b.dataset.mode===want)return;
+  b.dataset.mode=want;b.textContent="";
+  if(want==="active"){
+    b.append(el("button",{type:"button","data-p":"1",class:"pri",text:T.status==="pause"?"Riprendi":"Pausa",onclick:pauseTimer}),
+      el("button",{type:"button",text:"−15″",onclick:()=>addTime(-15)}),
+      el("button",{type:"button",text:"+15″",onclick:()=>addTime(15)}),
+      el("button",{type:"button",text:"Stop",onclick:stopTimer}));
+  }else{
+    [[60,"1′"],[90,"1′30″"],[120,"2′"],[180,"3′"]].forEach(([s,l])=>b.append(el("button",{type:"button",text:l,"aria-label":`Avvia recupero di ${l}`,onclick:()=>startTimer(T.name&&T.status==="end"?T.name:"Recupero libero",s)})));
+  }
+}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(T.status==="run")lockScreen();tick();}});
+drawTimer();
+
 renderAll();
 })();
 </script>
