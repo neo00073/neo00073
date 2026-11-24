@@ -1,0 +1,206 @@
+<title>Esercizi di Risveglio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una scheda per esercizio, figura animata in alto, passaggi e errori sotto; stessa palette dell'app */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --ink:#17202b; --muted:#5c6b7a; --line:#d8dee5;
+  --accent:#1f5fae; --accent-soft:#e3edf9; --far:#9fb0c2; --floor:#c9d2dc; --warn:#a8630b; --warn-soft:#fbf0dd;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10151c; --surface:#18202a; --ink:#e6ebf1; --muted:#93a1b0; --line:#2b3644;
+  --accent:#6ea4ea; --accent-soft:#1c2d44; --far:#56677a; --floor:#34414f; --warn:#e3a54c; --warn-soft:#3a2a12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151c; --surface:#18202a; --ink:#e6ebf1; --muted:#93a1b0; --line:#2b3644;
+  --accent:#6ea4ea; --accent-soft:#1c2d44; --far:#56677a; --floor:#34414f; --warn:#e3a54c; --warn-soft:#3a2a12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--f-display);margin:0;text-wrap:balance}
+h1{font-size:2.3rem;line-height:1.05;font-weight:800}
+h2{font-size:1.6rem;font-weight:700;line-height:1.1}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+nav.jump{display:flex;flex-wrap:wrap;gap:6px}
+nav.jump a{font-size:.82rem;color:var(--accent);background:var(--accent-soft);padding:5px 10px;border-radius:5px;text-decoration:none}
+article{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.fig{position:relative;background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.fig svg{display:block;width:100%;height:auto;max-height:260px}
+.fig .phase{position:absolute;left:12px;top:10px;font-family:var(--f-mono);font-size:.78rem;color:var(--accent);background:var(--surface);padding:3px 8px;border-radius:4px}
+.fig .view{position:absolute;right:12px;top:10px;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.fig button{position:absolute;right:10px;bottom:10px;font:inherit;font-size:.78rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+.body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dose{font-family:var(--f-mono);font-size:.85rem;color:var(--accent)}
+.why{margin:0;color:var(--muted)}
+ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
+ol li::marker{font-family:var(--f-mono);color:var(--accent)}
+.err{background:var(--warn-soft);border-radius:7px;padding:10px 12px;font-size:.9rem}
+.err b{color:var(--warn);display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.err ul{margin:0;padding-left:1.1em}
+.vid{align-self:flex-start;font-size:.86rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:6px;padding:6px 12px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="lbl">Giorno A · Spinta · 0–12′</span>
+    <h1>Esercizi di Risveglio</h1>
+    <p class="sub">Le figure si muovono come l'esercizio. Il tratto chiaro è la parte del corpo dal lato opposto. Vanno fatti lenti e senza carico: servono a scaldare, non a stancare.</p>
+  </header>
+  <nav class="jump" aria-label="Vai all'esercizio">
+    <a href="#bike">Bike / vogatore</a><a href="#catcamel">Cat-camel</a><a href="#openbook">Open book</a><a href="#pullapart">Band pull-apart</a><a href="#disloc">Dislocazioni</a><a href="#deadbug">Dead bug</a><a href="#scap">Push-up scapolari</a>
+  </nav>
+  <div id="list"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+// Pose: h testa, s spalla, c curva della schiena, p anca; e1/a1 gomito/mano vicini, e2/a2 lontani; k1/f1 ginocchio/piede vicini, k2/f2 lontani
+const quadA={a1:[150,118],a2:[150,118],k1:[70,118],k2:[70,118],f1:[34,117],f2:[34,117]};
+const EX=[
+ {id:"bike",name:"Bike o vogatore",dose:"5′ ritmo facile",
+  why:"Alza la temperatura del corpo e la frequenza cardiaca prima di tutto il resto.",
+  steps:["Resistenza bassa: devi poter parlare senza fiatone.","Bike: sella all'altezza dell'anca, gamba quasi tesa quando il pedale è in basso.","Vogatore: spingi prima con le gambe, poi apri il busto, per ultime tiri le braccia. Al ritorno l'ordine si inverte.","Negli ultimi 60″ aumenta un po' il ritmo, finché inizi appena a sudare."],
+  errs:["Partire forte: alle 6:00 il cuore ha bisogno di qualche minuto.","Vogatore tirato solo di braccia con la schiena curva."],
+  q:"vogatore tecnica corretta"},
+ {id:"catcamel",name:"Cat-camel",dose:"2×8 lente",view:"vista laterale",
+  why:"Muove la colonna vertebrale vertebra per vertebra, senza carico.",
+  steps:["A quattro zampe: mani sotto le spalle, ginocchia sotto le anche.","Espira e spingi la schiena verso l'alto, testa e coccige verso il basso (gatto).","Inspira e lascia scendere la pancia, sguardo in avanti e petto aperto (cammello).","Alterna lentamente: circa 3″ per posizione."],
+  errs:["Piegare le braccia: restano tese, si muove solo la schiena.","Andare veloce o forzare a fine movimento."],
+  q:"cat camel esercizio",
+  poses:[
+   {label:"Gatto · espira",hold:700,P:Object.assign({h:[164,95],s:[150,74],c:[110,38],p:[70,72],e1:[150,96],e2:[150,96]},quadA)},
+   {label:"Cammello · inspira",hold:700,P:Object.assign({h:[168,56],s:[150,72],c:[110,94],p:[70,70],e1:[150,95],e2:[150,95]},quadA)}]},
+ {id:"openbook",name:"Open book toracico",dose:"2×8 per lato",view:"vista dall'alto",
+  why:"Ruota la parte alta della schiena e apre il petto: prepara spalle e panca.",
+  steps:["Sdraiati su un fianco, anche e ginocchia piegate a 90°, ginocchia una sopra l'altra.","Braccia tese davanti al petto, palmi uniti.","Apri il braccio di sopra come la pagina di un libro, portandolo verso il pavimento dall'altro lato. Lo sguardo segue la mano.","Espira mentre apri, resta 2″, poi richiudi. Finite le ripetizioni, girati sull'altro fianco."],
+  errs:["Staccare le ginocchia: devono restare unite a terra, ruota solo il busto.","Spingere il braccio a forza fino a terra se non ci arriva."],
+  q:"open book thoracic rotation",
+  poses:[
+   {label:"Libro chiuso",hold:600,P:{h:[158,65],s:[140,65],c:[100,65],p:[60,65],e1:[142,88],a1:[145,112],e2:[142,88],a2:[145,112],k1:[66,100],f1:[30,104],k2:[66,100],f2:[30,104]}},
+   {label:"Apri ed espira",hold:900,P:{h:[158,65],s:[140,65],c:[100,65],p:[60,65],e1:[142,42],a1:[145,18],e2:[142,88],a2:[145,112],k1:[66,100],f1:[30,104],k2:[66,100],f2:[30,104]}}]},
+ {id:"pullapart",name:"Band pull-apart",dose:"2×15",view:"vista frontale",band:true,
+  why:"Attiva i muscoli tra le scapole e la parte posteriore delle spalle.",
+  steps:["In piedi, prendi un elastico leggero con le mani alla larghezza delle spalle.","Braccia tese davanti a te, all'altezza delle spalle.","Apri le braccia di lato tirando l'elastico fino al petto, stringendo le scapole.","Torna lentamente in 2″, senza lasciare che l'elastico ti tiri."],
+  errs:["Alzare le spalle verso le orecchie.","Piegare i gomiti o inarcare la schiena per finire il movimento."],
+  q:"band pull apart",
+  poses:[
+   {label:"Braccia avanti",hold:500,P:{h:[110,22],s:[110,36],c:[110,54],p:[110,72],e1:[101,40],a1:[97,42],e2:[119,40],a2:[123,42],k1:[103,95],f1:[100,118],k2:[117,95],f2:[120,118]}},
+   {label:"Apri e stringi le scapole",hold:700,P:{h:[110,22],s:[110,36],c:[110,54],p:[110,72],e1:[76,37],a1:[46,37],e2:[144,37],a2:[174,37],k1:[103,95],f1:[100,118],k2:[117,95],f2:[120,118]}}]},
+ {id:"disloc",name:"Dislocazioni con elastico",dose:"2×10",view:"vista laterale",band:true,tall:true,
+  why:"Porta le spalle in tutta la loro escursione. Il nome spaventa ma non si disloca niente.",
+  steps:["In piedi, elastico davanti alle cosce con una presa molto larga.","Braccia sempre tese: porta l'elastico in alto sopra la testa.","Continua all'indietro fino a portarlo dietro la schiena, all'altezza dei glutei.","Torna avanti con lo stesso percorso. Se fatica o fa male, allarga la presa."],
+  errs:["Piegare i gomiti per far passare l'elastico: allarga la presa.","Inarcare la schiena: addome contratto, costole giù."],
+  q:"shoulder dislocates resistance band",
+  poses:[
+   {label:"Davanti",hold:400,P:{h:[110,48],s:[110,62],c:[110,82],p:[110,102],e1:[120,85],a1:[128,108],e2:[120,85],a2:[128,108],k1:[110,122],f1:[116,142],k2:[110,122],f2:[116,142]}},
+   {label:"Sali",hold:0,P:{h:[110,48],s:[110,62],c:[110,82],p:[110,102],e1:[134,52],a1:[156,40],e2:[134,52],a2:[156,40],k1:[110,122],f1:[116,142],k2:[110,122],f2:[116,142]}},
+   {label:"Sopra la testa",hold:200,P:{h:[110,48],s:[110,62],c:[110,82],p:[110,102],e1:[110,38],a1:[110,14],e2:[110,38],a2:[110,14],k1:[110,122],f1:[116,142],k2:[110,122],f2:[116,142]}},
+   {label:"Vai dietro",hold:0,P:{h:[110,48],s:[110,62],c:[110,82],p:[110,102],e1:[87,52],a1:[66,42],e2:[87,52],a2:[66,42],k1:[110,122],f1:[116,142],k2:[110,122],f2:[116,142]}},
+   {label:"Dietro la schiena",hold:400,P:{h:[110,48],s:[110,62],c:[110,82],p:[110,102],e1:[101,85],a1:[94,108],e2:[101,85],a2:[94,108],k1:[110,122],f1:[116,142],k2:[110,122],f2:[116,142]}}]},
+ {id:"deadbug",name:"Dead bug a corpo libero",dose:"2×8 per lato",view:"vista laterale",
+  why:"Insegna all'addome a tenere ferma la schiena mentre braccia e gambe si muovono.",
+  steps:["Supino, braccia tese verso il soffitto, anche e ginocchia piegate a 90° (gambe a tavolino).","Schiaccia la zona lombare a terra ed espira a fondo.","Allunga insieme un braccio dietro la testa e la gamba opposta in avanti, sfiorando il pavimento.","Torna al centro e cambia lato. Lento: 3″ per andare, 2″ per tornare."],
+  errs:["La schiena si stacca da terra: accorcia il movimento finché resta giù.","Trattenere il fiato: espira mentre allunghi."],
+  q:"dead bug esercizio addome",
+  poses:[
+   {label:"Tavolino",hold:500,P:{h:[30,108],s:[50,112],c:[85,113],p:[120,113],e1:[50,88],a1:[50,64],e2:[50,88],a2:[50,64],k1:[120,80],f1:[155,80],k2:[120,80],f2:[155,80]}},
+   {label:"Braccio e gamba opposti",hold:800,P:{h:[30,108],s:[50,112],c:[85,113],p:[120,113],e1:[28,100],a1:[6,90],e2:[50,88],a2:[50,64],k1:[120,80],f1:[155,80],k2:[155,106],f2:[190,108]}}]},
+ {id:"scap",name:"Push-up scapolari",dose:"1×12",view:"vista laterale",
+  why:"Sveglia il dentato e i muscoli che muovono le scapole: protegge le spalle in panca.",
+  steps:["Posizione di plank sulle mani, braccia tese, corpo dritto dalla testa ai talloni.","Senza piegare i gomiti, lascia scendere il petto avvicinando le scapole.","Spingi il pavimento lontano, allargando le scapole: la parte alta della schiena si arrotonda un po'.","Il movimento è corto, pochi centimetri. Se è troppo difficile, fallo sulle ginocchia."],
+  errs:["Piegare le braccia: diventa un piegamento normale.","Lasciar cadere il bacino verso il basso."],
+  q:"scapular push up",
+  poses:[
+   {label:"Scapole insieme",hold:500,P:{h:[165,74],s:[150,78],c:[112,82],p:[75,78],e1:[150,98],a1:[150,118],e2:[150,98],a2:[150,118],k1:[46,96],f1:[18,116],k2:[46,96],f2:[18,116]}},
+   {label:"Spingi via il pavimento",hold:600,P:{h:[166,70],s:[150,66],c:[112,56],p:[75,74],e1:[150,92],a1:[150,118],e2:[150,92],a2:[150,118],k1:[46,96],f1:[18,116],k2:[46,96],f2:[18,116]}}]}
+];
+
+const NS="http://www.w3.org/2000/svg";
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function mk(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.append(n);return n;}
+function h(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
+const list=document.getElementById("list");list.style.cssText="display:flex;flex-direction:column;gap:18px";
+const anims=[];
+
+EX.forEach(ex=>{
+  const art=h("article");art.id=ex.id;
+  if(ex.poses){
+    const fig=h("div","fig");
+    const H=ex.tall?150:130;
+    const svg=mk("svg",{viewBox:`0 0 220 ${H}`,role:"img","aria-label":`${ex.name}: ${ex.poses.map(p=>p.label).join(", poi ")}`});
+    const floorY=ex.tall?142.5:118.5;
+    mk("line",{x1:0,x2:220,y1:floorY,y2:floorY,stroke:"var(--floor)","stroke-width":2},svg);
+    const far={stroke:"var(--far)","stroke-width":5,"stroke-linecap":"round","stroke-linejoin":"round",fill:"none"};
+    const near={stroke:"var(--ink)","stroke-width":5,"stroke-linecap":"round","stroke-linejoin":"round",fill:"none"};
+    const el={
+      farArm:mk("polyline",far,svg),farLeg:mk("polyline",far,svg),
+      band:ex.band?mk("line",{stroke:"var(--accent)","stroke-width":3,"stroke-linecap":"round"},svg):null,
+      spine:mk("path",Object.assign({},near,{"stroke-width":7}),svg),
+      neck:mk("line",near,svg),
+      head:mk("circle",{r:8,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":4},svg),
+      nearLeg:mk("polyline",near,svg),nearArm:mk("polyline",near,svg)
+    };
+    fig.append(svg);
+    const ph=h("span","phase",ex.poses[0].label);fig.append(ph);
+    if(ex.view)fig.append(h("span","view",ex.view));
+    const btn=h("button",null,reduce?"Avanti":"Pausa");btn.type="button";fig.append(btn);
+    art.append(fig);
+    const A={ex,el,ph,btn,i:0,t0:performance.now(),paused:false,stepMode:reduce};
+    btn.addEventListener("click",()=>{
+      if(A.stepMode){A.i=(A.i+1)%ex.poses.length;draw(A,ex.poses[A.i].P);ph.textContent=ex.poses[A.i].label;return;}
+      A.paused=!A.paused;btn.textContent=A.paused?"Riprendi":"Pausa";if(!A.paused)A.t0=performance.now()-A.elapsed;});
+    draw(A,ex.poses[0].P);
+    anims.push(A);
+  }
+  const body=h("div","body");
+  const head=h("div","head");head.append(h("h2",null,ex.name),h("span","dose",ex.dose));body.append(head);
+  body.append(h("p","why",ex.why));
+  const ol=h("ol");ex.steps.forEach(s=>ol.append(h("li",null,s)));body.append(ol);
+  const err=h("div","err");err.append(h("b",null,"Errori da evitare"));const ul=h("ul");ex.errs.forEach(s=>ul.append(h("li",null,s)));err.append(ul);body.append(err);
+  const a=h("a","vid","Guarda un video su YouTube ↗");a.href="https://www.youtube.com/results?search_query="+encodeURIComponent(ex.q);a.target="_blank";a.rel="noopener";body.append(a);
+  art.append(body);list.append(art);
+});
+
+function pt(p){return p[0]+","+p[1];}
+function draw(A,P){
+  const e=A.el;
+  e.farArm.setAttribute("points",[P.s,P.e2,P.a2].map(pt).join(" "));
+  e.farLeg.setAttribute("points",[P.p,P.k2,P.f2].map(pt).join(" "));
+  e.nearArm.setAttribute("points",[P.s,P.e1,P.a1].map(pt).join(" "));
+  e.nearLeg.setAttribute("points",[P.p,P.k1,P.f1].map(pt).join(" "));
+  // curva passante per c: punto di controllo = 2c − (p+s)/2
+  const cx=2*P.c[0]-(P.p[0]+P.s[0])/2, cy=2*P.c[1]-(P.p[1]+P.s[1])/2;
+  e.spine.setAttribute("d",`M${pt(P.p)} Q${cx},${cy} ${pt(P.s)}`);
+  e.neck.setAttribute("x1",P.s[0]);e.neck.setAttribute("y1",P.s[1]);
+  const dx=P.h[0]-P.s[0],dy=P.h[1]-P.s[1],L=Math.hypot(dx,dy)||1;
+  e.neck.setAttribute("x2",P.h[0]-dx/L*8);e.neck.setAttribute("y2",P.h[1]-dy/L*8);
+  e.head.setAttribute("cx",P.h[0]);e.head.setAttribute("cy",P.h[1]);
+  if(e.band){e.band.setAttribute("x1",P.a1[0]);e.band.setAttribute("y1",P.a1[1]);e.band.setAttribute("x2",P.a2[0]);e.band.setAttribute("y2",P.a2[1]);}
+}
+function lerpPose(A,B,t){const o={};for(const k in A)o[k]=[A[k][0]+(B[k][0]-A[k][0])*t,A[k][1]+(B[k][1]-A[k][1])*t];return o;}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const MOVE=1100;
+// sequenza avanti e indietro: 0,1,..,n-1,..,1
+function seq(n){const s=[];for(let i=0;i<n;i++)s.push(i);for(let i=n-2;i>0;i--)s.push(i);return s;}
+anims.forEach(A=>{A.order=seq(A.ex.poses.length);A.elapsed=0;
+  A.segs=A.order.map(i=>A.ex.poses[i].hold+MOVE);A.total=A.segs.reduce((a,b)=>a+b,0);});
+function frame(now){
+  anims.forEach(A=>{
+    if(A.stepMode||A.paused)return;
+    A.elapsed=(now-A.t0)%A.total;let t=A.elapsed,k=0;
+    while(t>=A.segs[k]){t-=A.segs[k];k++;}
+    const cur=A.ex.poses[A.order[k]],nxt=A.ex.poses[A.order[(k+1)%A.order.length]];
+    if(t<cur.hold){draw(A,cur.P);A.ph.textContent=cur.label;}
+    else{const u=ease((t-cur.hold)/MOVE);draw(A,lerpPose(cur.P,nxt.P,u));if(u>.5)A.ph.textContent=nxt.label;}
+  });
+  requestAnimationFrame(frame);
+}
+if(!reduce)requestAnimationFrame(frame);
+})();
+</script>
